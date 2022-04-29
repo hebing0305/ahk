@@ -1,0 +1,51 @@
+objExcel := ComObject("Excel.Application")
+objWorks := objExcel.Workbooks
+objWork := objWorks.Open("D:\test.xlsx")
+global line := 1
+list := Array()
+
+F1:: {
+  global line
+  line := line + 1
+  value1 := objExcel.Cells(line, 1).Value
+  if (!value1) {
+    MsgBox "数据录入完毕"
+    return
+  }
+
+  loop list.Length{
+    pos:=list[A_Index]
+    if (pos) {
+      value := objExcel.Cells(line, A_Index).Value
+      if (IsNumber(value)) {
+        value := Round(value)
+      }
+      Click pos
+      Send "^a"
+      sendkey value
+      OutputDebug ">>>" pos " " value
+    }
+    
+  }
+}
+
+F2:: {
+  global list
+  MouseGetPos & x, &y
+  pos := x " " y 
+  list.Push(pos)
+  MsgBox "输入框" list.Length "获取成功"
+}
+
+sendkey(str) {
+  Send str
+}
+
+fuck(ExitReason, ExitCode) {
+  objWork.Close
+  objWorks.Close
+  objExcel.Quit
+  OutputDebug "正常退出"
+}
+Persistent	; 阻止脚本自动退出.
+OnExit fuck
